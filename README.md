@@ -1,0 +1,4 @@
+- to run evolution of virtual creatures
+- python simulate.py
+- to show the creatures of the course of evolution
+- python show_best_creatures.py
