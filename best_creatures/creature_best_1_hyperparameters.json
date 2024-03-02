@@ -1,0 +1,7 @@
+{
+    "experiments": 1,
+    "population_size": 100,
+    "generations": 100,
+    "percent_prev_gen_to_keep": 0.5,
+    "mutation_rate": 10
+}

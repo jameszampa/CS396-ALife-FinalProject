@@ -1,0 +1,23 @@
+<mujoco model="unnamed_model">
+  <default>
+    <default class="/"/>
+  </default>
+  <worldbody>
+    <geom name="//unnamed_geom_0" class="/" type="plane" size="100 100 0.10000000000000001" pos="0 0 -1.7133633216537696"/>
+    <body name="body0" pos="0 0 0">
+      <joint name="//unnamed_joint_0" class="/" type="free"/>
+      <geom name="//unnamed_geom_1" class="/" type="sphere" size="0.71336332165376959 0.71336332165376959 0.71336332165376959"/>
+      <body name="body1" pos="1.2633371694520368 0 0">
+        <geom name="//unnamed_geom_2" class="/" type="sphere" size="0.54997384779826719 0.54997384779826719 0.54997384779826719"/>
+        <joint name="//unnamed_joint_1" class="/" type="hinge" axis="-1 0 0"/>
+        <body name="body2" pos="0 0 1.5449404487449068">
+          <geom name="//unnamed_geom_3" class="/" type="sphere" size="0.99496660094663958 0.99496660094663958 0.99496660094663958"/>
+          <joint name="//unnamed_joint_2" class="/" type="ball" axis="0 0 -1"/>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+  <actuator>
+    <motor name="body2_motor" class="/" ctrllimited="true" ctrlrange="-100 100" joint="//unnamed_joint_2"/>
+  </actuator>
+</mujoco>
