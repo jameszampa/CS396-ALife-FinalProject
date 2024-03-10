@@ -1,13 +1,13 @@
 import os
 import json
 import time
+import mujoco
 import mujoco.viewer
-import dm_control.mujoco
 
 
 def simulate(file_path, motor_strength_dict):
-    m = dm_control.mujoco.MjModel.from_xml_path(file_path)
-    d = dm_control.mujoco.MjData(m)
+    m = mujoco.MjModel.from_xml_path(file_path)
+    d = mujoco.MjData(m)
 
     with mujoco.viewer.launch_passive(m, d) as viewer:
         # Set camera parameters
@@ -22,13 +22,13 @@ def simulate(file_path, motor_strength_dict):
         for i in range(10000):
             for m_name in motor_strength_dict:
                 # print(m_name)
-                i = dm_control.mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_ACTUATOR, m_name)
+                i = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_ACTUATOR, m_name)
                 if motor_strength_dict[m_name] > 0:
                     d.ctrl[i] = 1000
                 else:
                     d.ctrl[i] = -1000
             
-            dm_control.mujoco.mj_step(m, d)
+            mujoco.mj_step(m, d)
             viewer.sync()
             time.sleep(1/1000)
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     for file_name in os.listdir("best_creatures"):
         if file_name.endswith(".xml") and file_name.startswith("gen"):
             gen_num = int(file_name.split("_")[0].replace("gen", ""))
-            best_creatures.append((f"best_creatures/{file_name}", gen_num))
+            best_creatures.append((f"best_creatures{os.sep}{file_name}", gen_num))
     best_creatures.sort(key=lambda x: x[1])
     best_creatures = [x[0] for x in best_creatures]
 
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     for file_name in os.listdir("best_creatures"):
 
         if file_name.endswith(".json"):
-            with open(f"best_creatures/{file_name}") as f:
+            with open(f"best_creatures{os.sep}{file_name}") as f:
                 motor_strength_dict.append(json.load(f))
 
     # Simulate the best creatures

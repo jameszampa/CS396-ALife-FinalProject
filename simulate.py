@@ -4,10 +4,9 @@ import copy
 import time
 import json
 import random
-import numpy as np
+import mujoco
 import mujoco.viewer
-import dm_control.mujoco
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 from genotype import SpherePart, mutate, get_all_sphere_parts, get_creature_length
 from phenotype import translate_genotype_to_phenotype, calculate_plane_height
 
@@ -16,8 +15,8 @@ def simulate(model, motor_strength_dict):
     with open('creature.xml', 'w') as f:
         f.write(model.to_xml_string())
     
-    m = dm_control.mujoco.MjModel.from_xml_path("creature.xml")
-    d = dm_control.mujoco.MjData(m)
+    m = mujoco.MjModel.from_xml_path("creature.xml")
+    d = mujoco.MjData(m)
 
     with mujoco.viewer.launch_passive(m, d) as viewer:
         # Set camera parameters
@@ -32,13 +31,13 @@ def simulate(model, motor_strength_dict):
         for i in range(20000):
             for m_name in motor_strength_dict:
                 # print(m_name)
-                i = dm_control.mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_ACTUATOR, m_name)
+                i = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_ACTUATOR, m_name)
                 if motor_strength_dict[m_name] > 0:
                     d.ctrl[i] = 1000
                 else:
                     d.ctrl[i] = -1000
             
-            dm_control.mujoco.mj_step(m, d)
+            mujoco.mj_step(m, d)
             viewer.sync()
             time.sleep(1/1000)
 
@@ -49,8 +48,8 @@ def simulate_no_viewer(genotype, model, motor_strength_dict):
     with open('creature.xml', 'w') as f:
         f.write(model.to_xml_string())
     
-    m = dm_control.mujoco.MjModel.from_xml_path("creature.xml")
-    d = dm_control.mujoco.MjData(m)
+    m = mujoco.MjModel.from_xml_path("creature.xml")
+    d = mujoco.MjData(m)
 
     fitness = 0
 
@@ -58,13 +57,13 @@ def simulate_no_viewer(genotype, model, motor_strength_dict):
     step_idx = 0
     while (step_idx < 5000 or (d.qvel[0]) > 0.00) and step_idx < 20000:
         for m_name in motor_strength_dict:
-            i = dm_control.mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_ACTUATOR, m_name)
+            i = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_ACTUATOR, m_name)
             if motor_strength_dict[m_name] > 0:
                 d.ctrl[i] = 1000
             else:
                 d.ctrl[i] = -1000
 
-        dm_control.mujoco.mj_step(m, d)
+        mujoco.mj_step(m, d)
         
         fitness += d.qvel[0] * 2
         fitness += d.qpos[0]
@@ -86,8 +85,8 @@ def get_new_file_name():
         if file_name.startswith("creature_best_") and file_name.endswith(".xml"):
             file_numbers.append(int(file_name[14:-4]))
     if len(file_numbers) == 0:
-        return "best_creatures/creature_best_1.xml"
-    return f"best_creatures/creature_best_{max(file_numbers) + 1}.xml"
+        return f"best_creatures{os.sep}creature_best_1.xml"
+    return f"best_creatures{os.sep}creature_best_{max(file_numbers) + 1}.xml"
 
 
 def main():
@@ -149,8 +148,8 @@ def main():
             #         copy_creatures.append(creature)
             # creatures = copy_creatures
             # mean and std of fitness
-            print(f"Mean fitness: {np.mean([creature.fitness for creature in creatures]):.4f}")
-            print(f"Std fitness: {np.std([creature.fitness for creature in creatures]):.4f}")
+            # print(f"Mean fitness: {np.mean([creature.fitness for creature in creatures]):.4f}")
+            # print(f"Std fitness: {np.std([creature.fitness for creature in creatures]):.4f}")
             # Mutate the creatures
             new_creatures = []
             while len(new_creatures) + len(creatures) < population_size:
@@ -177,11 +176,11 @@ def main():
         with open(file_name[:-4] + ".json", 'w') as f:
             f.write(json.dumps(motor_strength_dict, indent=4))
         # Create best_creature_fitness_history.png for each experiment
-        plt.plot(best_fitness_history)
-        plt.xlabel("Generation")
-        plt.ylabel("Fitness")
-        plt.title("Best Creature Fitness History")
-        plt.savefig(f"{file_name[:-4]}.png")
+        # plt.plot(best_fitness_history)
+        # plt.xlabel("Generation")
+        # plt.ylabel("Fitness")
+        # plt.title("Best Creature Fitness History")
+        # plt.savefig(f"{file_name[:-4]}.png")
         # Save hyperparameters
         with open(file_name[:-4] + "_hyperparameters.json", 'w') as f:
             json.dump({
